@@ -1,283 +1,341 @@
-import sys
-import folium
-import math
-import io
-from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
-from geopy.distance import geodesic
-post_list = {
-    'Bưu điện Thành phố Hồ Chí Minh': [10.780519673982457, 106.70014476621735],    
-    'Bưu Điện Đa Kao': [10.79265500947989, 106.6952577341717],
-    'Bưu điện Tân Định': [10.788918207046553, 106.69126331712023],
-    'EMS VNpost': [10.791493752635482, 106.7306934957712],
-    'Bưu điện Phước Bình': [10.818195872720759, 106.77249184735281],
-    'Bưu điện Thủ Đức': [10.857046496434508, 106.75532116170616],
-    'Trung Tâm Bưu Chính Sài Gòn - Bưu Cục Chợ Lớn': [10.759638024979667, 106.66740589952384],
-    'Bưu Điện Trưng Nữ Vương': [10.76386472122042, 106.66022608418389],
-    'Bưu Điện Nguyễn Duy Dương': [10.75572348776913, 106.6718022860288],
-    'Bưu Cục Quận 10': [10.767641799342156, 106.67375926884397],
-    'Bưu Cục Khai Thác Liên Tỉnh Hồ Chí Minh': [10.77625575486877, 106.65690992466898],
-    'Bưu Điện Tôn Thất Hiệp': [10.765565780086428, 106.65380429952384],
-    'Bưu Điện Quận 6': [10.749793816853172, 106.64221778602881],
-    'Bưu điện Hậu Giang': [10.74689289868615, 106.62791222144735],
-    'Bưu Điện Phú Mỹ': [10.7381962472482, 106.73017471193016],
-    'Bưu điện Quận 7': [10.714246235100116, 106.73738448904152],
-    'Bưu Điện Quận 8': [10.744990866301157, 106.65643545945515],
-    'Bưu Điện Tạ Quang Bửu': [10.735208916055054, 106.656564205475],
-    'EMS VNpost': [10.791493752635482, 106.7306934957712],
-    'Bưu Điện Bình Triệu': [10.8343324784891, 106.71334431660418],
-    'Vietnam Post Lê Văn Lương': [10.713642476168138, 106.70038030150313],
-    'Bưu điện Bình Trị Đông': [10.76029371165783, 106.61449104694232],
-    'Bưu điện Bình Thạnh': [10.805191097941576, 106.69447456286292],
-    'Bưu điện Hàng Xanh': [10.805191097941576, 106.71129737612279],
-    'Bưu điện Quận 3': [10.775399894402348, 106.69022036186234],
-    'Bưu Điện Gò Vấp': [10.822396764824115, 106.68850711395555],
-    'Bưu điện thị trấn Nhà Bè': [10.704499920718812, 106.73719100765997],
-    'Bưu điện Cần Giờ': [10.41397825988566, 106.96176488037887],
-    'Bưu Điện Phan Huy Ích VNPOST': [10.841899284977384, 106.63823675755052],
-    'Bưu điện Phú Nhuận': [10.797278416809684, 106.68093163972956],
-    'Bưu Điện Lê Văn Sỹ': [10.794510808293749, 106.66840544543382],
-    'VNPOST - Bưu Điện Tân Bình': [10.800628613728678, 106.65842011301109],
-    'Bưu Điện Tân Sơn Nhất': [10.816056986212775, 106.6664881969214],
-    'Bưu điện Tân Phú': [10.784815307399208, 106.62360785871186],
-    'Bưu điện Luỹ Bán Bích': [10.780093650013157, 106.6341650323392],
-    'Bưu điện Vĩnh Lộc': [10.815110254303454, 106.57887382687062],
-    'Bưu Điện Bình Chánh': [10.81696165743005, 106.52026709619074],
-}
+    from re import M # Lay ham M tu module re
+    import sys
+    import folium #Thu vien ho tro tao ra ban do 
+    import math
+    import io
+    from PyQt5 import  QtCore, QtGui, QtWidgets, QtWebEngineWidgets #QtWidgets : chia ung dung theo 2 phan 
+    from PyQt5.QtGui import QIcon
+    from geopy.distance import geodesic # Tinh khoang cah dia ly
+    post_list = {
+        'Bưu điện Thành phố Hồ Chí Minh': [10.780519673982457, 106.70014476621735],    
+        'Bưu Điện Đa Kao': [10.79265500947989, 106.6952577341717],
+        'Bưu điện Tân Định': [10.788918207046553, 106.69126331712023],
+        'EMS VNpost': [10.791493752635482, 106.7306934957712],
+        'Bưu điện Phước Bình': [10.818195872720759, 106.77249184735281],
+        'Bưu điện Thủ Đức': [10.857046496434508, 106.75532116170616],
+        'Trung Tâm Bưu Chính Sài Gòn - Bưu Cục Chợ Lớn': [10.759638024979667, 106.66740589952384],
+        'Bưu Điện Trưng Nữ Vương': [10.76386472122042, 106.66022608418389],
+        'Bưu Điện Nguyễn Duy Dương': [10.75572348776913, 106.6718022860288],
+        'Bưu Cục Quận 10': [10.767641799342156, 106.67375926884397],
+        'Bưu Cục Khai Thác Liên Tỉnh Hồ Chí Minh': [10.77625575486877, 106.65690992466898],
+        'Bưu Điện Tôn Thất Hiệp': [10.765565780086428, 106.65380429952384],
+        'Bưu Điện Quận 6': [10.749793816853172, 106.64221778602881],
+        'Bưu điện Hậu Giang': [10.74689289868615, 106.62791222144735],
+        'Bưu Điện Phú Mỹ': [10.7381962472482, 106.73017471193016],
+        'Bưu điện Quận 7': [10.714246235100116, 106.73738448904152],
+        'Bưu Điện Quận 8': [10.744990866301157, 106.65643545945515],
+        'Bưu Điện Tạ Quang Bửu': [10.735208916055054, 106.656564205475],
+        'EMS VNpost': [10.791493752635482, 106.7306934957712],
+        'Bưu Điện Bình Triệu': [10.8343324784891, 106.71334431660418],
+        'Vietnam Post Lê Văn Lương': [10.713642476168138, 106.70038030150313],
+        'Bưu điện Bình Trị Đông': [10.76029371165783, 106.61449104694232],
+        'Bưu điện Bình Thạnh': [10.805191097941576, 106.69447456286292],
+        'Bưu điện Hàng Xanh': [10.805191097941576, 106.71129737612279],
+        'Bưu điện Quận 3': [10.775399894402348, 106.69022036186234],
+        'Bưu Điện Gò Vấp': [10.822396764824115, 106.68850711395555],
+        'Bưu điện thị trấn Nhà Bè': [10.704499920718812, 106.73719100765997],
+        'Bưu điện Cần Giờ': [10.41397825988566, 106.96176488037887],
+        'Bưu Điện Phan Huy Ích VNPOST': [10.841899284977384, 106.63823675755052],
+        'Bưu điện Phú Nhuận': [10.797278416809684, 106.68093163972956],
+        'Bưu Điện Lê Văn Sỹ': [10.794510808293749, 106.66840544543382],
+        'VNPOST - Bưu Điện Tân Bình': [10.800628613728678, 106.65842011301109],
+        'Bưu Điện Tân Sơn Nhất': [10.816056986212775, 106.6664881969214],
+        'Bưu điện Tân Phú': [10.784815307399208, 106.62360785871186],
+        'Bưu điện Luỹ Bán Bích': [10.780093650013157, 106.6341650323392],
+        'Bưu điện Vĩnh Lộc': [10.815110254303454, 106.57887382687062],
+        'Bưu Điện Bình Chánh': [10.81696165743005, 106.52026709619074],
+    }
 
 
-class Window(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.markers = {}
-        self.initWindow()
-        
-    #full window
-    #self la QtWidget cha
-    def initWindow(self):
-        self.setWindowTitle("Map with Side Panel")
-        self.resize(1500, 600)
-        self.setupUI()
-
-    #User Interface
-    def setupUI(self):
-        central_widget = QtWidgets.QWidget()
-        self.setCentralWidget(central_widget)
-        layout = QtWidgets.QHBoxLayout(central_widget)
-
-        # Left side: Map
-        self.map = folium.Map(location=[10.780519673982457, 106.70014476621735], zoom_start=15, tiles='OpenStreetMap')
-        self.view = QtWebEngineWidgets.QWebEngineView()
-        self.resize(1800,1000)
-        self.updateMap()
-        
-        # Right side: Split into two rows
-        right_layout = QtWidgets.QVBoxLayout()
-        self.side_panel_label = QtWidgets.QLabel("Danh sách các bưu cục")
-        right_layout.addWidget(self.side_panel_label)
-        layout.addLayout(right_layout)
-        
-
-        # First row: List of destinations
-        # Create the QListWidget
-        self.side_panel = QtWidgets.QListWidget()
-
-        # Populate the list with post office names
-        self.side_panel.addItems(post_list.keys())
-
-        
-        self.side_panel.itemClicked.connect(self.onDestinationClicked)
-
-        # Add the QListWidget to the layout
-        right_layout.addWidget(self.side_panel)
-        # Second row: Button and label
-        button_solve = QtWidgets.QPushButton("Solve")
-        button_solve.clicked.connect(self.solveClicked)
-        button_solve.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #EFEFEF; /* Light gray background */
-                border: 1px solid #000000; /* Thin black border */
-                color: #000000; /* Cool cyan text color */
-                font: 14pt "Arial"; /* Easy-to-read font */
-                font-weight: bold;
-                padding: 5px 10px;
-                border-radius: 5px; /* Rounded corners */
-            }
+    class Window(QtWidgets.QMainWindow):
+        def __init__(self):
+            super().__init__()
+            self.markers = {}
+            self.initWindow()
             
-            QPushButton:hover {
-                background-color: #D0D0D0; /* Slightly darker gray on hover */
-            }
-            """
-        )
-        button_solve.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        right_layout.addWidget(button_solve)
-        
-        self.button_result=QtWidgets.QPushButton("TỔNG ĐỘ DÀI")
-        self.button_result.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #EFEFEF; /* Light gray background */
-                border: 1px solid #000000; /* Thin black border */
-                color: #000000; /* Cool cyan text color */
-                font: 14pt "Arial"; /* Easy-to-read font */
-                font-weight: bold;
-                padding: 5px 10px;
-                border-radius: 5px; /* Rounded corners */
-            }
+        #full window
+        #self la QtWidget cha
+        def initWindow(self):
+            self.setWindowTitle("projekc Terminato")
+            self.resize(1500, 600)
+            self.setWindowIcon(QIcon('Oe.png'))
+            self.setupUI()
+
+        #User Interface
+        def setupUI(self):
+            central_widget = QtWidgets.QWidget() #Tao bien nay de khi ta dieu chinh kich thuoc cua so 1 cach de dang hon 
+            self.setCentralWidget(central_widget)
+            layout = QtWidgets.QHBoxLayout(central_widget)
+
+            # Right side: Map
+            self.map = folium.Map(location=[10.780519673982457, 106.70014476621735], zoom_start=15, tiles='OpenStreetMap')
+            self.view = QtWebEngineWidgets.QWebEngineView() # Dua map len app thay vi file html
+            self.resize(1800,1000)
+            self.updateMap()
             
-            QPushButton:hover {
-                background-color: #D0D0D0; /* Slightly darker gray on hover */
-            }
-            """)
-        self.button_result.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        right_layout.addWidget(self.button_result)
-        
-        # Second QListWidget for displaying selected markers in order
-        self.selected_markers_list = QtWidgets.QListWidget()
-        right_layout.addWidget(self.selected_markers_list)
+            # Left side: Chia lam 2 cot
+            right_layout = QtWidgets.QVBoxLayout()
+            self.side_panel_label = QtWidgets.QLabel("Danh sách các bưu cục")
+            right_layout.addWidget(self.side_panel_label)
+            layout.addLayout(right_layout)
+            
 
-        layout.addWidget(self.view)
-        
-        self.initializeMarkers()
-        self.reloadMap()
-        coords=[(10.780387955042666, 106.7006035512192), (10.788918207046553, 106.69126331712023)]
-        line = folium.PolyLine(locations=coords, color='blue', weight=6, opacity=0.5)
-        # Add the PolyLine to the map
-        line.add_to(self.map)
-        #stretch factor
-        layout.addWidget(self.view, 3)  # Bản đồ có stretch factor lớn hơn
-        # Inside your setupUI method
+            # First row: Dia diem co the chon
+            # Create the QListWidget
+            self.side_panel = QtWidgets.QListWidget()
 
-        
+            # Populate the list with post office names
+            self.side_panel.addItems(post_list.keys())
 
-    def updateMap(self):
-        data = io.BytesIO()
-        self.map.save(data, close_file=False)
-        self.view.setHtml(data.getvalue().decode())
-        
-    def initializeMarkers(self):
-        for location, coords in post_list.items():
-            marker = folium.Marker(
-                location=coords,
-                popup=location,
-                icon=folium.Icon(icon='glyphicon glyphicon-envelope',color='red')
+            
+            self.side_panel.itemClicked.connect(self.onDestinationClicked)
+
+            # Add the QListWidget to the layout
+            right_layout.addWidget(self.side_panel)
+            #reset button
+            button_reset=QtWidgets.QPushButton("Làm mới")
+            button_reset.clicked.connect(self.resetClicked)
+            button_reset.setStyleSheet( 
+                """
+                QPushButton {
+                    background-color: #EFEFEF;
+                    border: 1px solid #000000; 
+                    color: #000000; 
+                    font: 14pt "Arial"; 
+                    font-weight: bold;
+                    padding: 5px 10px;
+                    border-radius: 5px; 
+                }
+                
+                QPushButton:hover { /* Khi de con chuot gan cai button thi doi mau */
+                    background-color: #D0D0D0; 
+                }
+                """
+                )
+            right_layout.addWidget(button_reset)
+            #solve button
+            button_solve = QtWidgets.QPushButton("Solve")
+            button_solve.clicked.connect(self.solveClicked)
+            button_solve.setStyleSheet(
+                """
+                QPushButton {
+                    background-color: #EFEFEF; 
+                    border: 1px solid #000000; 
+                    color: #000000;
+                    font: 14pt "Arial";
+                    font-weight: bold;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                }
+                
+                QPushButton:hover {
+                    background-color: #D0D0D0;
+                }
+                """
             )
-            marker.add_to(self.map)
-            self.markers[location] = {'marker': marker, 'visible': False}
-
-    def onDestinationClicked(self, item):
-        post_office_name = item.text()
-        destination = item.text()
-        marker_info = self.markers.get(destination)
-
-        if marker_info:
-            marker_info['visible'] = not marker_info['visible']
-            self.reloadMap()
-
-            # Add or remove the item from the selected markers list
-        if marker_info['visible']:
-            item.setForeground(QtGui.QColor('green'))
-            self.selected_markers_list.addItem(post_office_name)  # Add to second list
-        else:
-            item.setForeground(QtGui.QColor('black'))
-            # Find and remove the item from the selected markers list
-            items = self.selected_markers_list.findItems(post_office_name, QtCore.Qt.MatchExactly)
-            if items:
-                item_to_remove = items[0]  # Assuming there's only one item with this name
-                row = self.selected_markers_list.row(item_to_remove)
-                self.selected_markers_list.takeItem(row)
-
-    def reloadMap(self):
-        # Clear the map
-        self.map = folium.Map(location=[10.780519673982457, 106.70014476621735], zoom_start=15, tiles='OpenStreetMap')
-
-        # Add visible markers to the map
-        for location_info in self.markers.values():
-            if location_info['visible']:
-                location_info['marker'].add_to(self.map)
-
-        self.updateMap()
-        
-    
-        
-    
-    # Replace the solveClicked function with this corrected version
-    def solveClicked(self):
-    # Filter visible markers
-        visible_markers = [marker for marker in self.markers.values() if marker['visible']]
-        if len(visible_markers)<2: return
-        # Extract coordinates from visible markers
-        coord_list = [marker['marker'].location for marker in visible_markers]
-        # Create a graph and calculate the route and total distance
-        graph = [[self.calc_distance(coord1, coord2) for coord2 in coord_list] for coord1 in coord_list]
-        route, total = self.greedy_tsp(graph, 0)
-        drawline=[coord_list[i] for i in route]
-        print('route: ',route)
-        # Draw lines between markers and update the result label
-        # Format the total distance with two decimal places and append the unit
-        formatted_total = " Tổng quảng đường: {:.2f} km".format(total)  # Assuming the unit is kilometers
-        self.draw_lines_between_markers(drawline)
-        self.button_result.setText(formatted_total) 
-        
-
-    # Add self as the first parameter to total_distance to make it a class method
-    def total_distance(self,graph,order):
-        dist = 0
-        for i in range(len(order) - 1):
-            dist += graph[order[i]][order[i+1]]
-        print("total distance",dist)
-        return dist
-
-    def calc_distance(self, point1, point2):
-        return geodesic(point1, point2).kilometers
-    # def calc_distance(self, point1, point2):
-    #     lat1, lon1, _ = point1
-    #     lat2, lon2, _ = point2
-    #     return geodesic((lat1, lon1), (lat2, lon2)).kilometers
-
-    #  Greedy Algorithm for TSP
-    def greedy_tsp(self,graph, start):
-        num_points = len(graph)
-        # Start from the given starting point
-        current_point = start
-        # Initialize the order of points to visit
-        order = [current_point]
-        # Create a list to keep track of visited points
-        visited = [False] * num_points
-        visited[current_point] = True
-
-        for _ in range(num_points - 1):
-            min_dist = float('inf')
-            nearest_point = None
-            # Find the nearest unvisited point
-            for i in range(num_points):
-                if not visited[i]:
-                    dist = graph[current_point][i]
-                    if dist < min_dist:
-                        min_dist = dist
-                        nearest_point = i
-            # Mark the nearest point as visited and update current point
-            visited[nearest_point] = True
-            current_point = nearest_point
-            order.append(current_point)
-        order.append(order[0])
-        return order, self.total_distance(graph, order)
-
-    def draw_lines_between_markers(self, coord_list):
-        print(coord_list)
-        # Convert the coordinates list to the format required by folium
-        coords = [(coord[0], coord[1]) for coord in coord_list]
-        print(coords)
-        # Create a PolyLine object with the coordinates
-        line = folium.PolyLine(locations=coords, color='blue', weight=2.5, opacity=0.5)
-        # Add the PolyLine to the map
-        line.add_to(self.map)
-        # Update the map to show the changes
-        self.updateMap()
-
+            button_solve.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor)) #Doi hinh anh con tro
+            right_layout.addWidget(button_solve)
             
-if __name__ == "__main__":
-    App = QtWidgets.QApplication(sys.argv)
-    window = Window()
-    window.show()
-    sys.exit(App.exec())
+            self.button_result=QtWidgets.QPushButton("TỔNG ĐỘ DÀI")
+            self.button_result.setStyleSheet(
+                """
+                QPushButton {
+                    background-color: #EFEFEF; 
+                    border: 1px solid #000000;
+                    color: #000000;
+                    font: 14pt "Arial";
+                    font-weight: bold;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                }
+                
+                QPushButton:hover {
+                    background-color: #D0D0D0;
+                }
+                """)
+            self.button_result.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+            right_layout.addWidget(self.button_result)
+            
+            # Second QListWidget for displaying selected markers in order
+            self.selected_markers_list = QtWidgets.QListWidget()
+            right_layout.addWidget(self.selected_markers_list)
+            
+            
+            
+            layout.addWidget(self.view)
+            
+            self.initializeMarkers() #Tao ds cac diem dc danh dau
+            self.reloadMap()
+            coords=[(10.780387955042666, 106.7006035512192), (10.788918207046553, 106.69126331712023)]
+            line = folium.PolyLine(locations=coords, color='blue', weight=6, opacity=0.5)
+            # Add the PolyLine to the map
+            line.add_to(self.map)
+            #stretch factor
+            layout.addWidget(self.view, 3)  # Bản đồ có stretch factor lớn hơn
+            # Inside your setupUI method
+
+        def resetClicked(self):
+            # Clear QListWidget selections
+            for index in range(self.side_panel.count()):
+                item = self.side_panel.item(index)
+                item.setForeground(QtGui.QColor('black'))
+
+            # Clear the second list widget
+            self.selected_markers_list.clear()
+            self.button_result.setText(" Tổng quảng đường: 0 km")
+            # Reinitialize markers and reload map
+            self.initializeMarkers()
+            self.reloadMap()
+    
+        
+        def updateMap(self):
+            data = io.BytesIO()
+            self.map.save(data, close_file=False)
+            self.view.setHtml(data.getvalue().decode())
+        #cho nay hoi kho hieu dk, cach dat ten hoi xam qua    
+        def initializeMarkers(self):
+            for name, coords in post_list.items():
+                marker = folium.Marker(
+                    location=coords,
+                    popup=name,
+                    icon=folium.Icon(icon='glyphicon glyphicon-envelope',color='red')
+                )
+                marker.add_to(self.map)
+                self.markers[name] = {'marker': marker, 'visible': False}
+            
+        def onDestinationClicked(self, item): #Khi ta click vao se hien thi ten dia diem
+            #flag
+            if self.selected_markers_list.count()>1:
+                items = self.selected_markers_list.findItems(self.selected_markers_list.item(0).text(), QtCore.Qt.MatchExactly)
+                
+                if len(items)>1:
+                    item_to_remove = items[0]
+                    row = self.selected_markers_list.row(item_to_remove)
+                    self.selected_markers_list.takeItem(row)
+
+            #flag
+            
+            post_office_name = item.text()
+            destination = item.text()
+            marker_info = self.markers.get(destination)
+
+            if marker_info:
+                marker_info['visible'] = not marker_info['visible']
+                self.reloadMap()
+
+                # Add or remove the item from the selected markers list
+            if marker_info['visible']:
+                item.setForeground(QtGui.QColor('green'))
+                self.selected_markers_list.addItem(post_office_name)  # Add to second list
+            else:
+                item.setForeground(QtGui.QColor('black'))
+                # Find and remove the item from the selected markers list
+                items = self.selected_markers_list.findItems(post_office_name, QtCore.Qt.MatchExactly)
+                if items:
+                    item_to_remove = items[0]  # Assuming there's only one item with this name
+                    row = self.selected_markers_list.row(item_to_remove)
+                    self.selected_markers_list.takeItem(row)
+
+        def reloadMap(self):
+            # Clear the map
+            self.map = folium.Map(location=[10.780519673982457, 106.70014476621735], zoom_start=15, tiles='OpenStreetMap')
+
+            # Add visible markers to the map
+            for location_info in self.markers.values():
+                if location_info['visible']:
+                    location_info['marker'].add_to(self.map)
+
+            self.updateMap()
+            
+        
+        
+        
+        
+        def solveClicked(self):
+            name_list = [self.selected_markers_list.item(i).text() for i in range(self.selected_markers_list.count())]
+            if len(name_list) < 2:
+                return  
+            coord_list = [post_list[post_office] for post_office in name_list]
+            graph = [[self.calc_distance(coord1, coord2) for coord2 in coord_list] for coord1 in coord_list]
+            # Determine the starting position
+            start_position = 0
+            if self.selected_markers_list.count() > 0:
+                first_selected_name = self.selected_markers_list.item(0).text()
+                if first_selected_name in name_list:
+                    start_position = name_list.index(first_selected_name)
+            if 'Bưu điện Thành phố Hồ Chí Minh' in name_list:
+                start_position= name_list.index('Bưu điện Thành phố Hồ Chí Minh')
+            route, total = self.greedy_tsp(graph, start_position)
+            drawline = [coord_list[i] for i in route]
+            name_route_list = [name_list[i] for i in route]
+            print('route: ',route)
+            print('route: ',name_route_list)
+            print('total distance: ',total)
+            
+            formatted_total = " Tổng quảng đường: {:.2f} km".format(total)  # Assuming the unit is kilometers
+            
+            self.draw_lines_between_markers(drawline)
+            self.button_result.setText(formatted_total) 
+            self.selected_markers_list.clear()
+            for name in name_route_list:
+                self.selected_markers_list.addItem(name)
+            
+
+
+            # Add self as the first parameter to total_distance to make it a class method
+        def total_distance(self,graph,order): 
+            dist = 0
+            for i in range(len(order) - 1):
+                dist += graph[order[i]][order[i+1]]
+        
+            return dist
+
+        def calc_distance(self, point1, point2):
+            return geodesic(point1, point2).kilometers
+        
+        #Greedy Algorithm for TSP
+        def greedy_tsp(self,graph, start):
+            num_points = len(graph)
+            # Start from the given starting point
+            current_point = start
+            # Initialize the order of points to visit
+            order = [current_point]
+            # Create a list to keep track of visited points
+            visited = [False] * num_points
+            visited[current_point] = True
+
+            for _ in range(num_points - 1):
+                min_dist = float('inf')
+                nearest_point = None
+                # Find the nearest unvisited point
+                for i in range(num_points):
+                    if not visited[i]:
+                        dist = graph[current_point][i]
+                        if dist < min_dist:
+                            min_dist = dist
+                            nearest_point = i
+                # Mark the nearest point as visited and update current point
+                visited[nearest_point] = True
+                current_point = nearest_point
+                order.append(current_point)
+            order.append(order[0])
+            return order, self.total_distance(graph, order)
+
+        def draw_lines_between_markers(self, coord_list):
+            
+            # Convert the coordinates list to the format required by folium
+            coords = [(coord[0], coord[1]) for coord in coord_list]
+            
+            # Create a PolyLine object with the coordinates
+            line = folium.PolyLine(locations=coords, color='blue', weight=2.5, opacity=0.5)
+            # Add the PolyLine to the map
+            line.add_to(self.map)
+            # Update the map to show the changes
+            self.updateMap()
+
+                
+    if __name__ == "__main__":  #Giong ham main trong c++
+        App = QtWidgets.QApplication(sys.argv)
+        window = Window()
+        window.show()
+        sys.exit(App.exec())
